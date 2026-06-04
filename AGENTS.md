@@ -155,6 +155,7 @@ Artifacts include:
 
 - Use `apply_patch` for hand edits.
 - Keep behavior conservative and explicit.
+- Keep generated build output, run artifacts, local env files, logs, coverage output, caches, and editor/OS metadata out of git via `.gitignore`.
 - Prefer deterministic local logic for git safety and commit messages.
 - Keep reviewer context clean: do not leak implementer conversation into review prompts.
 - Preserve the target repo except for intended Codex changes and explicitly requested commit/push actions.
