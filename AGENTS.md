@@ -81,14 +81,14 @@ The command shape is:
 codex-loop run [options]
 ```
 
-If `--repo` is omitted, the repo defaults to the config file repo or the current directory. If `--issue` and `--issue-text` are both provided, their contents are combined.
+If `--repo` is omitted, the repo defaults to the config file repo or the current directory. If `--issue` and `--prompt` are both provided, their contents are combined. `--issue-text` remains available as a compatibility alias for `--prompt`, but new docs and examples should use `--prompt`.
 
 Important options:
 
 - `--config <path>`: JSON config file.
 - `--repo <path>`: target git repository.
 - `--issue <path>`: issue/task file.
-- `--issue-text <text>`: inline issue/task text.
+- `--prompt <text>`: inline issue/task text.
 - `--model <model>`: Codex model, default `gpt-5.4`.
 - `--max-iterations <number>`: bounded loop limit, default `5`.
 - `--validation <command>`: validation command, repeatable.

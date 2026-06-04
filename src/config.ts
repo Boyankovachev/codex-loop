@@ -11,7 +11,7 @@ type RawCliOptions = {
   configPath?: string;
   repo?: string;
   issuePath?: string;
-  issueText?: string;
+  prompt?: string;
   model?: string;
   maxIterations?: number;
   validationCommands?: string[];
@@ -49,7 +49,7 @@ export async function loadCliConfig(argv: string[], cwd: string): Promise<LoopCo
   const issue = await loadIssue({
     cwd,
     issuePath: cli.issuePath,
-    issueText: cli.issueText,
+    prompt: cli.prompt,
   });
 
   const validationCommands =
@@ -102,13 +102,13 @@ export function usage(): string {
 
 Usage:
   codex-loop run --issue issue.md --config codex-loop.config.json
-  codex-loop run --repo "C:\\Dplan-mono" --issue-text "Fix the failing auth redirect test"
+  codex-loop run --repo "C:\\Dplan-mono" --prompt "Fix the failing auth redirect test"
 
 Options:
   --config <path>             JSON config file. Defaults to ./codex-loop.config.json when present.
   --repo <path>               Target git repository. Defaults to config repo or current directory.
   --issue <path>              Markdown/text file with the requested task.
-  --issue-text <text>         Inline requested task.
+  --prompt <text>             Inline requested task.
   --model <model>             Codex model. Default: ${DEFAULT_MODEL}
   --max-iterations <number>   Maximum implement/review attempts. Default: ${DEFAULT_MAX_ITERATIONS}
   --validation <command>      Validation command. May be repeated.
@@ -161,8 +161,11 @@ function parseArgs(argv: string[]): RawCliOptions {
       case "--issue":
         options.issuePath = readValue();
         break;
+      case "--prompt":
+        options.prompt = readValue();
+        break;
       case "--issue-text":
-        options.issueText = readValue();
+        options.prompt = readValue();
         break;
       case "--model":
         options.model = readValue();
@@ -266,7 +269,7 @@ async function readConfigFile(configPath: string): Promise<ConfigFile> {
 async function loadIssue(args: {
   cwd: string;
   issuePath?: string;
-  issueText?: string;
+  prompt?: string;
 }): Promise<string> {
   const parts: string[] = [];
 
@@ -280,12 +283,12 @@ async function loadIssue(args: {
     }
   }
 
-  if (args.issueText) {
-    parts.push(args.issueText);
+  if (args.prompt) {
+    parts.push(args.prompt);
   }
 
   if (parts.length === 0) {
-    fail("Provide --issue <path> or --issue-text <text>.");
+    fail("Provide --issue <path> or --prompt <text>.");
   }
 
   return parts.join("\n\n").trim();
