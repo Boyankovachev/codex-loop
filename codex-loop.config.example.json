@@ -1,0 +1,10 @@
+{
+  "repo": "C:\\Dplan-mono",
+  "model": "gpt-5.4",
+  "maxIterations": 5,
+  "commit": false,
+  "push": false,
+  "validationCommands": [
+    "npm test"
+  ]
+}
