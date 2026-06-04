@@ -24,25 +24,25 @@ This assumes the local machine has Codex access and `git` on `PATH`. The CLI che
 From the project folder:
 
 ```bash
-npm run dev -- run --repo "C:\Dplan-mono" --issue issue.md --validation "npm test"
+npm run dev -- run --repo "D:\project-folder" --issue issue.md --validation "npm test"
 ```
 
 With an inline prompt:
 
 ```bash
-npm run dev -- run --repo "C:\Dplan-mono" --prompt "Fix the failing auth redirect test" --validation "npm test"
+npm run dev -- run --repo "D:\project-folder" --prompt "Fix the failing auth redirect test" --validation "npm test"
 ```
 
 From another folder, either point npm at this project:
 
 ```bash
-npm --prefix "C:\codex-loop" run dev -- run --repo "C:\Dplan-mono" --prompt "Fix the failing auth redirect test"
+npm --prefix "C:\codex-loop" run dev -- run --repo "D:\project-folder" --prompt "Fix the failing auth redirect test"
 ```
 
 Or run the built file directly:
 
 ```bash
-node "C:\codex-loop\dist\cli.js" run --repo "C:\Dplan-mono" --prompt "Fix the failing auth redirect test"
+node "C:\codex-loop\dist\cli.js" run --repo "D:\project-folder" --prompt "Fix the failing auth redirect test"
 ```
 
 For a normal global-style command, link it once:
@@ -55,7 +55,7 @@ npm link
 Then run `codex-loop` from any folder:
 
 ```bash
-cd C:\Dplan-mono
+cd D:\project-folder
 codex-loop run --prompt "Fix the failing auth redirect test" --validation "npm test"
 ```
 
@@ -158,11 +158,11 @@ Fatal failures stop the run with details and suggested remediation where Codex p
 Commit and push are opt-in:
 
 ```bash
-npm run dev -- run --repo "C:\Dplan-mono" --issue issue.md --validation "npm test" --commit
+npm run dev -- run --repo "D:\project-folder" --issue issue.md --validation "npm test" --commit
 ```
 
 ```bash
-npm run dev -- run --repo "C:\Dplan-mono" --issue issue.md --validation "npm test" --push
+npm run dev -- run --repo "D:\project-folder" --issue issue.md --validation "npm test" --push
 ```
 
 `--push` implies `--commit`. `--commit-and-push` is an alias for `--push`.
