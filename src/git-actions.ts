@@ -156,10 +156,14 @@ async function checkPushReadiness(repo: string): Promise<{ ok: true } | { ok: fa
     const [aheadText, behindText] = counts.stdout.trim().split(/\s+/);
     const behind = Number(behindText ?? "0");
     if (behind > 0) {
-      return {
-        ok: false,
-        reason: `Push blocked: ${upstream.upstream} contains ${behind} commit(s) not present locally. Merge or rebase is needed before pushing.`,
-      };
+      const merge = await tryGit(["merge", "--no-edit", upstream.upstream], repo);
+      if (merge.exitCode !== 0) {
+        await tryGit(["merge", "--abort"], repo);
+        return {
+          ok: false,
+          reason: `Push blocked: ${upstream.upstream} contains ${behind} commit(s) not present locally and they conflict with the local commit. The merge was aborted to keep the working tree clean; resolve the conflicts manually before pushing.\n${(merge.stderr || merge.stdout).trimEnd()}`,
+        };
+      }
     }
 
     return { ok: true };
