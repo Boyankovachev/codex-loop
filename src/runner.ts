@@ -193,6 +193,10 @@ export async function runLoop(config: LoopConfig, log: Logger): Promise<LoopResu
   let status: LoopResult["status"] = attempts.some((attempt) => attempt.passed) ? "passed" : "failed";
   let gitAction: GitActionResult | undefined;
 
+  // Capture changed files before any commit/push action: committing clears the
+  // working tree, so reading status afterwards would report no changes.
+  const changedFiles = await gitChangedFiles(config.repo);
+
   if (status === "passed" && (config.commit || config.push)) {
     log(config.push ? "Committing and pushing final passing changes." : "Committing final passing changes.");
     gitAction = await commitAndMaybePush({ config, attempts });
@@ -203,7 +207,6 @@ export async function runLoop(config: LoopConfig, log: Logger): Promise<LoopResu
   }
 
   const postActionGitStatus = await gitStatus(config.repo);
-  const changedFiles = await gitChangedFiles(config.repo);
 
   const result: LoopResult = {
     status,
