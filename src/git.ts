@@ -1,13 +1,11 @@
 import { execFile } from "node:child_process";
-import { readFile, stat } from "node:fs/promises";
-import path from "node:path";
+import { stat } from "node:fs/promises";
 import { promisify } from "node:util";
 
 import { fail } from "./errors.js";
 
 const execFileAsync = promisify(execFile);
 const MAX_GIT_BUFFER = 100 * 1024 * 1024;
-const MAX_UNTRACKED_FILE_BYTES = 512 * 1024;
 
 export type GitCommandResult = {
   exitCode: number | null;
@@ -68,7 +66,9 @@ export async function gitDiff(repo: string): Promise<string> {
   }
 
   if (untracked.trim().length > 0) {
-    sections.push(["# Untracked files", "", untracked.trimEnd()].join("\n"));
+    sections.push(
+      ["# Untracked files (new files — read their contents from the working tree)", "", untracked.trimEnd()].join("\n"),
+    );
   }
 
   return sections.length > 0 ? `${sections.join("\n\n")}\n` : "";
@@ -172,56 +172,12 @@ export async function tryGit(
 
 async function gitUntrackedFiles(repo: string): Promise<string> {
   const output = await git(["ls-files", "--others", "--exclude-standard"], repo);
-  const files = output
+  return output
     .split(/\r?\n/)
     .map((file) => file.trim())
-    .filter(Boolean);
-
-  if (files.length === 0) {
-    return "";
-  }
-
-  const sections: string[] = [];
-  for (const file of files) {
-    const absolutePath = path.join(repo, file);
-    let fileStat;
-    try {
-      fileStat = await stat(absolutePath);
-    } catch {
-      sections.push(`## ${file}\n\n(unable to stat file)\n`);
-      continue;
-    }
-
-    if (!fileStat.isFile()) {
-      sections.push(`## ${file}\n\n(non-file entry)\n`);
-      continue;
-    }
-
-    const bytes = await readFile(absolutePath);
-    if (isProbablyBinary(bytes)) {
-      sections.push(`## ${file}\n\n(binary file, ${fileStat.size} bytes)\n`);
-      continue;
-    }
-
-    const content =
-      bytes.length > MAX_UNTRACKED_FILE_BYTES
-        ? `${bytes.subarray(0, MAX_UNTRACKED_FILE_BYTES).toString("utf8")}\n\n[truncated ${bytes.length - MAX_UNTRACKED_FILE_BYTES} bytes]\n`
-        : bytes.toString("utf8");
-
-    sections.push([`## ${file}`, "", "```", content.trimEnd(), "```", ""].join("\n"));
-  }
-
-  return sections.join("\n");
-}
-
-function isProbablyBinary(bytes: Buffer): boolean {
-  const limit = Math.min(bytes.length, 8000);
-  for (let index = 0; index < limit; index += 1) {
-    if (bytes[index] === 0) {
-      return true;
-    }
-  }
-  return false;
+    .filter(Boolean)
+    .map((file) => `- ${file}`)
+    .join("\n");
 }
 
 async function git(args: string[], cwd: string): Promise<string> {

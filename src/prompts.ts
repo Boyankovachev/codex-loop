@@ -32,11 +32,21 @@ export function buildReviewPrompt(args: {
   const diff = args.gitDiff.trim().length > 0 ? args.gitDiff : "(no git diff)";
   const status = args.gitStatus.trim().length > 0 ? args.gitStatus : "(clean)";
 
-  return `You are a clean-session reviewer. Do not modify files.
+  return `You are a clean-session reviewer with read-only access to the repository at the working directory.
+
+You are an active agent, not a passive diff reader. The diff below is a starting point, not the full picture.
+Investigate the actual repository before reporting:
+- Open the changed files and read the surrounding code, not just the diff hunks.
+- Read related files the change depends on or affects (callers, types, tests, config).
+- Search the codebase (grep/ripgrep, file listing) to confirm a finding is real before reporting it.
+- Run read-only checks when useful to verify behavior (for example: type lookups, focused test reads, git history).
+You may run commands and read any file. You must not modify files, write to disk, or access the network.
+Prefer verified findings grounded in the real repository state over guesses from the diff alone.
 
 Review the implementation for correctness, regressions, missing tests, scope creep, and validation quality.
 
-Return only JSON matching the provided schema. Do not wrap it in Markdown.
+Your final message must be only JSON matching the provided schema. Do not wrap it in Markdown.
+You may run tool calls while investigating, but the final response must contain nothing but the JSON.
 Every finding must include a string file field. Use an empty string when no specific file applies.
 
 Severity guidance:
