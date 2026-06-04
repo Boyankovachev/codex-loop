@@ -13,6 +13,7 @@ The reviewer only sees the original issue, current git status, current diff, and
 
 ```bash
 npm install
+npm test
 npm run build
 ```
 
@@ -78,7 +79,11 @@ Passes the task prompt inline on the command line. `--issue-text` still works as
 
 `--model <model>`
 
-Sets the Codex model for both implementer and reviewer sessions. Default: `gpt-5.4`.
+Sets the Codex model for both implementer and reviewer sessions. Default: `gpt-5.5`.
+
+`--reasoning-effort <value>`
+
+Sets Codex reasoning effort for both implementer and reviewer sessions. Allowed values are `minimal`, `low`, `medium`, `high`, and `xhigh`. Default: `high`.
 
 `--max-iterations <number>`
 

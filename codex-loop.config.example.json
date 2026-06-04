@@ -1,6 +1,7 @@
 {
   "repo": "C:\\Dplan-mono",
-  "model": "gpt-5.4",
+  "model": "gpt-5.5",
+  "modelReasoningEffort": "high",
   "maxIterations": 5,
   "commit": false,
   "push": false,

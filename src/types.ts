@@ -1,8 +1,9 @@
-import type { ApprovalMode, SandboxMode } from "@openai/codex-sdk";
+import type { ApprovalMode, ModelReasoningEffort, SandboxMode } from "@openai/codex-sdk";
 
 export type ConfigFile = {
   repo?: unknown;
   model?: unknown;
+  modelReasoningEffort?: unknown;
   maxIterations?: unknown;
   validationCommands?: unknown;
   allowDirty?: unknown;
@@ -57,6 +58,7 @@ export type LoopConfig = {
   issuePath?: string;
   configPath?: string;
   model: string;
+  modelReasoningEffort: ModelReasoningEffort;
   maxIterations: number;
   validationCommands: string[];
   allowDirty: boolean;

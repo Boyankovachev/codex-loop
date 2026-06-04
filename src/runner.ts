@@ -76,6 +76,7 @@ export async function runLoop(config: LoopConfig, log: Logger): Promise<LoopResu
     sandboxMode: config.implementerSandbox,
     approvalPolicy: config.approvalPolicy,
     model: config.model,
+    modelReasoningEffort: config.modelReasoningEffort,
   });
 
   log("Starting implementer turn 1.");
@@ -110,6 +111,7 @@ export async function runLoop(config: LoopConfig, log: Logger): Promise<LoopResu
       sandboxMode: config.reviewerSandbox,
       approvalPolicy: config.approvalPolicy,
       model: config.model,
+      modelReasoningEffort: config.modelReasoningEffort,
     });
 
     const reviewTurn = await reviewer.run(

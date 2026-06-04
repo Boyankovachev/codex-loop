@@ -42,6 +42,12 @@ Install dependencies:
 npm install
 ```
 
+Run the bundled local checks:
+
+```bash
+npm test
+```
+
 Typecheck:
 
 ```bash
@@ -89,7 +95,8 @@ Important options:
 - `--repo <path>`: target git repository.
 - `--issue <path>`: issue/task file.
 - `--prompt <text>`: inline issue/task text.
-- `--model <model>`: Codex model, default `gpt-5.4`.
+- `--model <model>`: Codex model, default `gpt-5.5`.
+- `--reasoning-effort <value>`: Codex reasoning effort, default `high`; allowed values are `minimal`, `low`, `medium`, `high`, and `xhigh`.
 - `--max-iterations <number>`: bounded loop limit, default `5`.
 - `--validation <command>`: validation command, repeatable.
 - `--allow-dirty`: allow starting with target repo changes.

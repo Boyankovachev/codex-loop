@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import type { ModelReasoningEffort } from "@openai/codex-sdk";
 
 import { fail } from "./errors.js";
 import type { ConfigFile, LoopConfig } from "./types.js";
@@ -13,6 +14,7 @@ type RawCliOptions = {
   issuePath?: string;
   prompt?: string;
   model?: string;
+  modelReasoningEffort?: ModelReasoningEffort;
   maxIterations?: number;
   validationCommands?: string[];
   allowDirty?: boolean;
@@ -27,10 +29,12 @@ type RawCliOptions = {
   commitAndPush?: boolean;
 };
 
-const DEFAULT_MODEL = "gpt-5.4";
+const DEFAULT_MODEL = "gpt-5.5";
+const DEFAULT_MODEL_REASONING_EFFORT: ModelReasoningEffort = "high";
 const DEFAULT_MAX_ITERATIONS = 5;
 const DEFAULT_MAX_DIFF_CHARS = 120_000;
 const DEFAULT_MAX_VALIDATION_CHARS = 60_000;
+const MODEL_REASONING_EFFORTS = new Set<ModelReasoningEffort>(["minimal", "low", "medium", "high", "xhigh"]);
 
 export async function loadCliConfig(argv: string[], cwd: string): Promise<LoopConfig> {
   const cli = parseArgs(argv);
@@ -75,6 +79,10 @@ export async function loadCliConfig(argv: string[], cwd: string): Promise<LoopCo
     issuePath: cli.issuePath ? path.resolve(cwd, cli.issuePath) : undefined,
     configPath,
     model: cli.model ?? stringOrUndefined(fileConfig.model, "model") ?? DEFAULT_MODEL,
+    modelReasoningEffort:
+      cli.modelReasoningEffort ??
+      modelReasoningEffortOrUndefined(fileConfig.modelReasoningEffort, "modelReasoningEffort") ??
+      DEFAULT_MODEL_REASONING_EFFORT,
     maxIterations,
     validationCommands,
     allowDirty: cli.allowDirty ?? booleanOrUndefined(fileConfig.allowDirty, "allowDirty") ?? false,
@@ -110,6 +118,7 @@ Options:
   --issue <path>              Markdown/text file with the requested task.
   --prompt <text>             Inline requested task.
   --model <model>             Codex model. Default: ${DEFAULT_MODEL}
+  --reasoning-effort <value>  Reasoning effort: minimal, low, medium, high, xhigh. Default: ${DEFAULT_MODEL_REASONING_EFFORT}
   --max-iterations <number>   Maximum implement/review attempts. Default: ${DEFAULT_MAX_ITERATIONS}
   --validation <command>      Validation command. May be repeated.
   --allow-dirty               Allow starting when the target repo already has changes.
@@ -169,6 +178,9 @@ function parseArgs(argv: string[]): RawCliOptions {
         break;
       case "--model":
         options.model = readValue();
+        break;
+      case "--reasoning-effort":
+        options.modelReasoningEffort = parseModelReasoningEffort(readValue(), name);
         break;
       case "--max-iterations":
         options.maxIterations = parsePositiveInteger(readValue(), name);
@@ -246,6 +258,14 @@ function parsePositiveInteger(value: string, optionName: string): number {
     fail(`${optionName} must be a positive integer.`);
   }
   return parsed;
+}
+
+function parseModelReasoningEffort(value: string, optionName: string): ModelReasoningEffort {
+  if (MODEL_REASONING_EFFORTS.has(value as ModelReasoningEffort)) {
+    return value as ModelReasoningEffort;
+  }
+
+  fail(`${optionName} must be one of: ${Array.from(MODEL_REASONING_EFFORTS).join(", ")}.`);
 }
 
 function resolveConfigPath(configPath: string | undefined, cwd: string): string | undefined {
@@ -328,6 +348,18 @@ function stringOrUndefined(value: unknown, name: string): string | undefined {
   }
 
   return value;
+}
+
+function modelReasoningEffortOrUndefined(value: unknown, name: string): ModelReasoningEffort | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value !== "string") {
+    fail(`Config field ${name} must be a string.`);
+  }
+
+  return parseModelReasoningEffort(value, name);
 }
 
 function booleanOrUndefined(value: unknown, name: string): boolean | undefined {
