@@ -22,6 +22,9 @@ coverage/
 .tmp/
 tmp/
 
+# Claude Code local settings
+.claude/
+
 # OS and editor metadata
 .DS_Store
 Thumbs.db
